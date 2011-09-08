@@ -95,7 +95,7 @@ afwDetection::Astrometry::Ptr RotationAngle::doMeasure(CONST_PTR(ExposureT) imag
         afwImage::Wcs::ConstPtr wcs = image->getWcs();
         if (wcs) {
             afwGeom::Point2D const pix(peak->getFx(), peak->getFy());
-            afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwCoord::RADIANS);
+            afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwGeom::radians);
             afwGeom::AffineTransform::ParameterVector const param = lin.getParameterVector();
             east = ::atan2(param[lin.XY], param[lin.XX]);
             north = ::atan2(param[lin.YY], param[lin.YX]);
