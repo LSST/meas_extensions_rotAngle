@@ -30,20 +30,22 @@
 
 #include <stdio.h>
 
-namespace afwDetection = lsst::afw::detection;
+namespace afwDet = lsst::afw::detection;
 namespace afwCoord = lsst::afw::coord;
 namespace afwImage = lsst::afw::image;
 namespace afwGeom = lsst::afw::geom;
+namespace measAlg = lsst::meas::algorithms;
 
 namespace lsst {
 namespace meas {
 namespace extensions {
 namespace rotAngle {
 
-/**
- * @brief A class that calculates the rotation angles (angles between x axis of CCD and East,North)
- */
-class RotationAngle : public afwDetection::Astrometry
+/// Reports the orientation of the CCD on the sky
+///
+/// This doesn't really belong in "Astrometry", but that's the closest of
+/// Astrometry/Photometry/Shape.
+class RotationAngle : public afwDet::Astrometry
 {
 protected:
     enum { EAST = Astrometry::NVALUE, NORTH, NVALUE };
@@ -52,76 +54,89 @@ public:
     typedef boost::shared_ptr<RotationAngle const> ConstPtr;
 
     /// Ctor
-    RotationAngle(double east, double north) : afwDetection::Astrometry() {
+    RotationAngle(double east, double north) : afwDet::Astrometry() {
         init();
         // Everything has to be set, even to a meaningless value
-        set<X>(std::numeric_limits<double>::quiet_NaN());
-        set<X_ERR>(std::numeric_limits<double>::quiet_NaN());
-        set<Y>(std::numeric_limits<double>::quiet_NaN());
-        set<Y_ERR>(std::numeric_limits<double>::quiet_NaN());
+        double const NaN = std::numeric_limits<double>::quiet_NaN();
+        set<X>(NaN);
+        set<X_ERR>(NaN);
+        set<Y>(NaN);
+        set<Y_ERR>(NaN);
 
         set<EAST>(east);
         set<NORTH>(north);
     }
+    RotationAngle() : afwDet::Astrometry() {
+        init();
+    }
     
     /// Add desired fields to the schema
-    virtual void defineSchema(afwDetection::Schema::Ptr schema) {
-        schema->add(afwDetection::SchemaEntry("east", EAST, afwDetection::Schema::DOUBLE, 1, "radians"));
-        schema->add(afwDetection::SchemaEntry("north", NORTH, afwDetection::Schema::DOUBLE, 1, "radians"));
+    virtual void defineSchema(afwDet::Schema::Ptr schema) {
+        schema->add(afwDet::SchemaEntry("east", EAST, afwDet::Schema::DOUBLE, 1, "radians"));
+        schema->add(afwDet::SchemaEntry("north", NORTH, afwDet::Schema::DOUBLE, 1, "radians"));
     }
 
-    template<typename ExposureT>
-    static Astrometry::Ptr doMeasure(CONST_PTR(ExposureT),
-                                     CONST_PTR(afwDetection::Peak),
-                                     CONST_PTR(afwDetection::Source)
-                                    );
+    double getEast() const { return afwDet::Astrometry::get<EAST, double>(); }
+    double getNorth() const { return afwDet::Astrometry::get<NORTH, double>(); }
 
-    double getEast() const { return afwDetection::Astrometry::get<EAST, double>(); }
-    double getNorth() const { return afwDetection::Astrometry::get<NORTH, double>(); }
 private:
-    RotationAngle(void) : afwDetection::Astrometry() { }
     LSST_SERIALIZE_PARENT(lsst::afw::detection::Astrometry);
+};
+LSST_REGISTER_SERIALIZER(RotationAngle);
+
+/**
+ * @brief A class that calculates the rotation angles (angles between x axis of CCD and East,North)
+ */
+template<typename ExposureT>
+class RotationAngleAlgorithm : public measAlg::Algorithm<afwDet::Astrometry, ExposureT>
+{
+public:
+    typedef measAlg::Algorithm<afwDet::Astrometry, ExposureT> AlgorithmT;
+    typedef boost::shared_ptr<RotationAngleAlgorithm> Ptr;
+    typedef boost::shared_ptr<RotationAngleAlgorithm const> ConstPtr;
+
+    /// Ctor
+    RotationAngleAlgorithm() : AlgorithmT() {}
+
+    virtual std::string getName() const { return "ROTANGLE"; }
+
+    virtual PTR(AlgorithmT) clone() const {
+        return boost::make_shared<RotationAngleAlgorithm<ExposureT> >();
+    }
+
+    virtual void configure(pexPolicy::Policy const& policy) {}
+
+    virtual PTR(afwDet::Astrometry) measureNull(void) const {
+        double const NaN = std::numeric_limits<double>::quiet_NaN();
+        return boost::make_shared<RotationAngle>(NaN, NaN);
+    }
+
+    virtual PTR(afwDet::Astrometry) measureOne(measAlg::ExposurePatch<ExposureT> const& patch,
+                                               afwDet::Source const& source) const;
 };
 
 template<typename ExposureT>
-afwDetection::Astrometry::Ptr RotationAngle::doMeasure(CONST_PTR(ExposureT) image,
-                                                       CONST_PTR(afwDetection::Peak) peak,
-                                                       CONST_PTR(afwDetection::Source) source
-    )
+PTR(afwDet::Astrometry) RotationAngleAlgorithm<ExposureT>::measureOne(
+    measAlg::ExposurePatch<ExposureT> const& patch,
+    afwDet::Source const& source
+    ) const
 {
-    double east = std::numeric_limits<double>::quiet_NaN();
-    double north = std::numeric_limits<double>::quiet_NaN();
-    if (peak) {
-        afwImage::Wcs::ConstPtr wcs = image->getWcs();
-        if (wcs) {
-            afwGeom::Point2D const pix(peak->getFx(), peak->getFy());
-            afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwCoord::RADIANS);
-            afwGeom::AffineTransform::ParameterVector const param = lin.getParameterVector();
-            east = ::atan2(param[lin.XY], param[lin.XX]);
-            north = ::atan2(param[lin.YY], param[lin.YX]);
-        }
-    }   
+    CONST_PTR(ExposureT) exp = patch.getExposure();
+    afwImage::Wcs::ConstPtr wcs = exp->getWcs();
+    if (!wcs) {
+        double const NaN = std::numeric_limits<double>::quiet_NaN();
+        return boost::make_shared<RotationAngle>(NaN, NaN);
+    }
+
+    CONST_PTR(afwDet::Peak) peak = patch.getPeak();
+    afwGeom::Point2D const pix(peak->getFx(), peak->getFy());
+    afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwCoord::RADIANS);
+    afwGeom::AffineTransform::ParameterVector const param = lin.getParameterVector();
+    double const east = ::atan2(param[lin.XY], param[lin.XX]);
+    double const north = ::atan2(param[lin.YY], param[lin.YX]);
     return boost::make_shared<RotationAngle>(east, north);
 }
 
-/*
- * Declare the existence of the algorithm to MeasureAstrometry
- *
- * @cond
- */
-#define INSTANTIATE(TYPE) \
-    lsst::meas::algorithms::MeasureAstrometry<afwImage::Exposure<TYPE> >::declare("ROTANGLE", \
-        &RotationAngle::doMeasure<afwImage::Exposure<TYPE> > \
-        )
-
-volatile bool isInstance[] = {
-    INSTANTIATE(int),
-    INSTANTIATE(float),
-    INSTANTIATE(double),
-};
-
-LSST_REGISTER_SERIALIZER(RotationAngle);
-
-// \endcond
+LSST_DECLARE_ALGORITHM(RotationAngleAlgorithm, afwDet::Astrometry);
 
 }}}}
