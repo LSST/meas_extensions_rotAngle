@@ -1,5 +1,5 @@
 /* 
- * LSST Data Management System
+ * Lsst Data Management System
  * Copyright 2008, 2009, 2010 LSST Corporation.
  * 
  * This product includes software developed by the
