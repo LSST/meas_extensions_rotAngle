@@ -130,7 +130,7 @@ PTR(afwDet::Astrometry) RotationAngleAlgorithm<ExposureT>::measureOne(
 
     CONST_PTR(afwDet::Peak) peak = patch.getPeak();
     afwGeom::Point2D const pix(peak->getFx(), peak->getFy());
-    afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwCoord::RADIANS);
+    afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwGeom::radians);
     afwGeom::AffineTransform::ParameterVector const param = lin.getParameterVector();
     double const east = ::atan2(param[lin.XY], param[lin.XX]);
     double const north = ::atan2(param[lin.YY], param[lin.YX]);
