@@ -111,14 +111,15 @@ public:
         return boost::make_shared<RotationAngle>(NaN, NaN);
     }
 
-    virtual PTR(afwDet::Astrometry) measureOne(measAlg::ExposurePatch<ExposureT> const& patch,
-                                               afwDet::Source const& source) const;
+    virtual PTR(afwDet::Astrometry) measureSingle(afwDet::Source const&, afwDet::Source const&,
+                                                  measAlg::ExposurePatch<ExposureT> const&) const;
 };
 
 template<typename ExposureT>
-PTR(afwDet::Astrometry) RotationAngleAlgorithm<ExposureT>::measureOne(
-    measAlg::ExposurePatch<ExposureT> const& patch,
-    afwDet::Source const& source
+PTR(afwDet::Astrometry) RotationAngleAlgorithm<ExposureT>::measureSingle(
+    afwDet::Source const& target,
+    afwDet::Source const& source,
+    measAlg::ExposurePatch<ExposureT> const& patch
     ) const
 {
     CONST_PTR(ExposureT) exp = patch.getExposure();
@@ -128,9 +129,7 @@ PTR(afwDet::Astrometry) RotationAngleAlgorithm<ExposureT>::measureOne(
         return boost::make_shared<RotationAngle>(NaN, NaN);
     }
 
-    CONST_PTR(afwDet::Peak) peak = patch.getPeak();
-    afwGeom::Point2D const pix(peak->getFx(), peak->getFy());
-    afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(pix, afwGeom::radians);
+    afwGeom::AffineTransform const lin = wcs->linearizePixelToSky(patch.getCenter(), afwGeom::radians);
     afwGeom::AffineTransform::ParameterVector const param = lin.getParameterVector();
     double const east = ::atan2(param[lin.XY], param[lin.XX]);
     double const north = ::atan2(param[lin.YY], param[lin.YX]);

@@ -67,7 +67,7 @@ class RotationAngleTestCase(unittest.TestCase):
                 astrom.addAlgorithm("ROTANGLE")
 
                 x, y = 10, 20
-                ast = astrom.measure(exp, afwDetection.Peak(x, y), afwDetection.Source(0)).find()
+                ast = astrom.measure(afwDetection.Source(0), exp, afwGeom.Point2D(x, y)).find()
 
                 east, north = ast.get("east"), ast.get("north")
 
