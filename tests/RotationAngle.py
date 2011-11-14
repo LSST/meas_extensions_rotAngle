@@ -55,7 +55,7 @@ class RotationAngleTestCase(unittest.TestCase):
 
         scale = 5.0e-5                  # Pixel scale: 0.18 arcsec/pixel
         for angle in (0, 45, 90, 120, 180, 275):
-            for expFactory in (afwImage.ExposureF, afwImage.ExposureI):
+            for expFactory in (afwImage.ExposureF, afwImage.ExposureD):
                 angle = math.radians(angle)
                 cdMatrix = [[scale * math.cos(angle), scale * math.sin(angle)],
                             [scale * -math.sin(angle), scale * math.cos(angle)]]
@@ -67,7 +67,7 @@ class RotationAngleTestCase(unittest.TestCase):
                 astrom.addAlgorithm("ROTANGLE")
 
                 x, y = 10, 20
-                ast = astrom.measure(afwDetection.Peak(x, y)).find()
+                ast = astrom.measure(afwDetection.Source(0), exp, afwGeom.Point2D(x, y)).find()
 
                 east, north = ast.get("east"), ast.get("north")
 
