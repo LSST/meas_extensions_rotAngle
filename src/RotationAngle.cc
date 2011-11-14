@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 
+namespace pexPolicy = lsst::pex::policy;
 namespace afwDet = lsst::afw::detection;
 namespace afwCoord = lsst::afw::coord;
 namespace afwImage = lsst::afw::image;
