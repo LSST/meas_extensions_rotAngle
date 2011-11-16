@@ -1,0 +1,14 @@
+
+# /
+/config.log
+/.scon*
+
+# /python/lsst/meas/extensions/rotAngle/
+/python/lsst/meas/extensions/rotAngle/*_wrap.*
+/python/lsst/meas/extensions/rotAngle/rotAngleLib.py
+
+# /src/
+/src/*.os
+
+# /tests/
+/tests/.tests
