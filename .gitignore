@@ -1,14 +1,14 @@
-
-# /
-/config.log
-/.scon*
-
-# /python/lsst/meas/extensions/rotAngle/
-/python/lsst/meas/extensions/rotAngle/*_wrap.*
-/python/lsst/meas/extensions/rotAngle/rotAngleLib.py
-
-# /src/
-/src/*.os
-
-# /tests/
-/tests/.tests
+*.dylib
+*.o
+*.os
+*.pyc
+*.so
+.sconf_temp
+.sconsign.dblite
+config.log
+.scon*
+python/lsst/meas/extensions/rotAngle/*_wrap.*
+python/lsst/meas/extensions/rotAngle/rotAngleLib.py
+tests/.tests
+ups/*.cfgc
+python/lsst/meas/extensions/rotAngle/version.py
