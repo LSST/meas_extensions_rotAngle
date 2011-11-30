@@ -83,7 +83,6 @@ public:
 private:
     LSST_SERIALIZE_PARENT(lsst::afw::detection::Astrometry);
 };
-LSST_REGISTER_SERIALIZER(RotationAngle);
 
 /**
  * @brief A class that calculates the rotation angles (angles between x axis of CCD and East,North)
@@ -140,3 +139,5 @@ PTR(afwDet::Astrometry) RotationAngleAlgorithm<ExposureT>::measureSingle(
 LSST_DECLARE_ALGORITHM(RotationAngleAlgorithm, afwDet::Astrometry);
 
 }}}}
+
+LSST_REGISTER_SERIALIZER(lsst::meas::extensions::rotAngle::RotationAngle);

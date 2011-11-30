@@ -33,6 +33,7 @@ import lsst.meas.algorithms as algorithms
 import lsst.utils.tests as utilsTests
 
 import lsst.meas.extensions.rotAngle
+import numpy
 
 try:
     type(verbose)
@@ -57,8 +58,8 @@ class RotationAngleTestCase(unittest.TestCase):
         for angle in (0, 45, 90, 120, 180, 275):
             for expFactory in (afwImage.ExposureF, afwImage.ExposureD):
                 angle = math.radians(angle)
-                cdMatrix = [[scale * math.cos(angle), scale * math.sin(angle)],
-                            [scale * -math.sin(angle), scale * math.cos(angle)]]
+                cdMatrix = numpy.array([[scale * math.cos(angle), scale * math.sin(angle)],
+                                        [scale * -math.sin(angle), scale * math.cos(angle)]])
                 
                 wcs = afwImage.Wcs(afwGeom.Point2D(0, 0), afwGeom.Point2D(50, 50), cdMatrix)
                 exp = expFactory(afwGeom.ExtentI(100, 100), wcs)
