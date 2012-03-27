@@ -12,9 +12,8 @@ namespace lsst { namespace meas { namespace extensions { namespace rotAngle {
  *  @sa RotAngleConfig.
  */
 class RotAngleControl : public algorithms::AlgorithmControl {
-protected:
-    RotAngleControl(std::string const& name, double priority=3.0) :
-        algorithms::AlgorithmControl(name, priority) {}
+public:
+    RotAngleControl() : algorithms::AlgorithmControl("rotAngle", 3.0) {}
 
 private:
     virtual PTR(algorithms::AlgorithmControl) _clone() const {

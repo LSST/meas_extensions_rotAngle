@@ -20,11 +20,11 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from rotAngleLib import *
-import lsst.utils
+from .rotAngleLib import *
+from .version import *
 
-def version():
-    """Return current version. If a different version is setup, return that too"""
+import lsst.meas.algorithms
+lsst.meas.algorithms.AlgorithmRegistry.register("rotAngle", RotAngleControl)
+del lsst # cleanup namespace
 
-    HeadURL = r"$HeadURL$"
-    return lsst.utils.version(HeadURL, "meas_extensions_rotAngle")
+

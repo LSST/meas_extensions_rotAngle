@@ -32,3 +32,23 @@ Interface to rotation angle 'measurement'
 /* **EDIT** fooLib (3 places) */
 %feature("autodoc", "1");
 %module(package="lsst.meas.extensions.rotAngle.rotAngleLib", docstring=rotAngleLib_DOCSTRING) rotAngleLib
+
+
+%{
+#include "lsst/base.h"
+#include "lsst/pex/logging.h"
+#include "lsst/afw/detection/Footprint.h"
+#include "lsst/afw/image/Utils.h"
+#include "lsst/afw/geom/Point.h"
+#include "lsst/meas/algorithms.h"
+#include "lsst/meas/extensions/rotAngle.h"
+%}
+
+%include "lsst/p_lsstSwig.i"
+
+%include "lsst/base.h"
+%import "lsst/meas/algorithms/algorithmsLib.i"
+
+%shared_ptr(lsst::meas::extensions::rotAngle::RotAngleControl);
+
+%include "lsst/meas/extensions/rotAngle.h"

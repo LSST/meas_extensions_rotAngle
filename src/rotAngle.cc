@@ -68,14 +68,13 @@ void RotAngle::_apply(
 ) const {
     afw::image::Wcs::ConstPtr wcs = exposure.getWcs();
     afw::table::Angle east, north;
-    if (wcs) {
-        double const NaN = std::numeric_limits<double>::quiet_NaN();
-        east = north = NaN * afw::geom::radians;
+    if (!wcs) {
+        east = north = std::numeric_limits<double>::quiet_NaN() * afw::geom::radians;
     } else {
         afw::geom::AffineTransform const lin = wcs->linearizePixelToSky(center, afw::geom::radians);
         afw::geom::AffineTransform::ParameterVector const param = lin.getParameterVector();
-        east = ::atan2(param[lin.XY], param[lin.XX]) * afw::geom::radians;
-        north = ::atan2(param[lin.YY], param[lin.YX]) * afw::geom::radians;
+        north = ::atan2(param[lin.XY], param[lin.XX]) * afw::geom::radians;
+        east = ::atan2(param[lin.YY], param[lin.YX]) * afw::geom::radians;
     }
 
     source.set(_northKey, north);
