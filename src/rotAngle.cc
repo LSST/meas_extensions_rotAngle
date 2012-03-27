@@ -67,7 +67,7 @@ void RotAngle::_apply(
     afw::geom::Point2D const & center
 ) const {
     afw::image::Wcs::ConstPtr wcs = exposure.getWcs();
-    Angle east, north;
+    afw::table::Angle east, north;
     if (wcs) {
         double const NaN = std::numeric_limits<double>::quiet_NaN();
         east = north = NaN * afw::geom::radians;
