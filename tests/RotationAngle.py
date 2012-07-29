@@ -57,7 +57,7 @@ class RotationAngleTestCase(unittest.TestCase):
     def measureRotAngle(self, exposure, x, y):
         """Measure rotation angle quantities using the C++ code"""
         msConfig = measAlg.SourceMeasurementConfig()
-        msConfig.algorithms.names = msConfig.algorithms.names + ("rotAngle",)
+        msConfig.algorithms.names.add("rotAngle")
         schema = afwTable.SourceTable.makeMinimalSchema()
         ms = msConfig.makeMeasureSources(schema)
         table = afwTable.SourceTable.make(schema)
