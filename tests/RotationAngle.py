@@ -23,10 +23,8 @@
 #
 
 import math
-import pdb                          # we may want to say pdb.set_trace()
 import unittest
 
-import lsst.pex.config as pexConf
 import lsst.afw.image as afwImage
 import lsst.afw.table as afwTable
 import lsst.afw.geom as afwGeom
@@ -34,7 +32,6 @@ import lsst.afw.detection as afwDetection
 import lsst.meas.algorithms as measAlg
 import lsst.utils.tests as utilsTests
 
-import lsst.meas.extensions.rotAngle
 import numpy
 
 try:
