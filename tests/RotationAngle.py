@@ -60,7 +60,7 @@ class RotationAngleTestCase(unittest.TestCase):
         table = afwTable.SourceTable.make(schema)
         msConfig.slots.setupTable(table)
         source = table.makeRecord()
-        fp = afwDetection.Footprint(exposure.getBBox())
+        fp = afwDetection.Footprint(exposure.getBBox(afwImage.LOCAL))
         source.setFootprint(fp)
         center = afwGeom.Point2D(x, y)
         ms.apply(source, exposure, center)
